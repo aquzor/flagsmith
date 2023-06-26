@@ -230,100 +230,16 @@ const Utils = Object.assign({}, require('./base/_utils'), {
     return 'Manage Identities'
   },
   getPlanName: (plan: string) => {
-    if (plan && plan.includes('scale-up')) {
-      return planNames.scaleUp
-    }
-    if (plan && plan.includes('side-project')) {
-      return planNames.sideProject
-    }
-    if (plan && plan.includes('startup')) {
-      return planNames.startup
-    }
-    if (plan && plan.includes('start-up')) {
-      return planNames.startup
-    }
-    if (plan && plan.includes('enterprise')) {
+
       return planNames.enterprise
-    }
-    return planNames.free
+
   },
   getPlanPermission: (plan: string, permission: string) => {
-    let valid = true
-    const planName = Utils.getPlanName(plan)
-    if (!Utils.getFlagsmithHasFeature('plan_based_access')) {
-      return true
-    }
-    if (!plan || planName === planNames.free) {
-      return false
-    }
-    const isSideProjectOrGreater = planName !== planNames.sideProject
-    const isScaleupOrGreater =
-      isSideProjectOrGreater && planName !== planNames.startup
-    const isEnterprise = planName === planNames.enterprise
-
-    switch (permission) {
-      case 'FLAG_OWNERS': {
-        valid = isScaleupOrGreater
-        break
-      }
-      case 'CREATE_ADDITIONAL_PROJECT': {
-        valid = isSideProjectOrGreater
-        break
-      }
-      case '2FA': {
-        valid = isSideProjectOrGreater
-        break
-      }
-      case 'RBAC': {
-        valid = isSideProjectOrGreater
-        break
-      }
-      case 'AUDIT': {
-        valid = isScaleupOrGreater
-        break
-      }
-      case 'AUTO_SEATS': {
-        valid = isScaleupOrGreater && !isEnterprise
-        break
-      }
-      case 'FORCE_2FA': {
-        valid = isScaleupOrGreater
-        break
-      }
-      case 'SCHEDULE_FLAGS': {
-        valid = isSideProjectOrGreater
-        break
-      }
-      case '4_EYES': {
-        valid = isScaleupOrGreater
-        break
-      }
-      default:
-        valid = true
-        break
-    }
-    return valid
+   return true;
   },
 
   getPlansPermission: (permission: string) => {
-    if (!Utils.getFlagsmithHasFeature('plan_based_access')) {
-      return true
-    }
-    const isOrgPermission = permission !== '2FA'
-    const plans = isOrgPermission
-      ? AccountStore.getActiveOrgPlan()
-        ? [AccountStore.getActiveOrgPlan()]
-        : null
-      : AccountStore.getPlans()
-
-    if (!plans || !plans.length) {
-      return false
-    }
-    const found = _.find(
-      plans.map((plan: string) => Utils.getPlanPermission(plan, permission)),
-      (perm) => !!perm,
-    )
-    return !!found
+   return true;
   },
   getSDKEndpoint(_project: ProjectType) {
     const project = _project || ProjectStore.model
